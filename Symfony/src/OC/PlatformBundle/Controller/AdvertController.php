@@ -3,7 +3,7 @@
  * @Author: Mehdi
  * @Date:   2014-11-15 16:33:06
  * @Last Modified by:   Mehdi
- * @Last Modified time: 2014-11-15 18:05:16
+ * @Last Modified time: 2014-11-15 18:42:24
  */
 
 //src/OC/PlatformBundle/Controller/AdvertController.php
@@ -37,6 +37,21 @@ class AdvertController extends Controller{
 	}
 
 	public function indexAction(){ //méthode appellée par le noyau
+		$content = $this->get('templating')->render('OCPlatformBundle:Advert:index.html.twig', array('nom' => 'Mehdi'));
+		return new Response($content);
+	}
+
+	public function addAction(){ //méthode appellée par le noyau
+		$content = $this->get('templating')->render('OCPlatformBundle:Advert:index.html.twig', array('nom' => 'Mehdi'));
+		return new Response($content);
+	}
+
+	public function editAction($id){ //méthode appellée par le noyau
+		$content = $this->get('templating')->render('OCPlatformBundle:Advert:index.html.twig', array('nom' => 'Mehdi'));
+		return new Response($content);
+	}
+
+	public function deleteAction($id){ //méthode appellée par le noyau
 		$content = $this->get('templating')->render('OCPlatformBundle:Advert:index.html.twig', array('nom' => 'Mehdi'));
 		return new Response($content);
 	}

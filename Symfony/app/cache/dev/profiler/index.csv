@@ -68,3 +68,13 @@ d4a9cb,127.0.0.1,GET,http://localhost/Symfony/web/app_dev.php/platform/advert/5,
 e29036,127.0.0.1,GET,http://localhost/Symfony/web/app_dev.php/platform,1416071641,
 1e84cb,127.0.0.1,GET,http://localhost/Symfony/web/app_dev.php/platform/,1416071644,b3a6d9
 b3a6d9,127.0.0.1,GET,http://localhost/Symfony/web/app_dev.php/platform/,1416071644,
+6468fd,127.0.0.1,GET,http://localhost/Symfony/web/app_dev.php/platform,1416073095,6c5c57
+6c5c57,127.0.0.1,GET,http://localhost/Symfony/web/app_dev.php/platform,1416073096,
+17f899,127.0.0.1,GET,http://localhost/Symfony/web/app_dev.php/platform,1416073118,
+0de25c,127.0.0.1,GET,http://localhost/Symfony/web/app_dev.php/platform/1,1416073123,
+d51ed4,127.0.0.1,GET,http://localhost/Symfony/web/app_dev.php/advert/1,1416073142,e73a18
+e73a18,127.0.0.1,GET,http://localhost/Symfony/web/app_dev.php/advert/1,1416073142,
+786d71,127.0.0.1,GET,http://localhost/Symfony/web/app_dev.php/platform/advert/1,1416073311,
+90488b,127.0.0.1,GET,http://localhost/Symfony/web/app_dev.php/platform/add,1416073360,
+683572,127.0.0.1,GET,http://localhost/Symfony/web/app_dev.php/platform/edit/1,1416073369,
+e69558,127.0.0.1,GET,http://localhost/Symfony/web/app_dev.php/platform/delete/1,1416073376,

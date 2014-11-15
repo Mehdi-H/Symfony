@@ -36,13 +36,6 @@ class __TwigTemplate_569ec9cea14741c72ddc7fd0970ddd2a123df0908c137c1463ad3a08c72
             réussi à exécuter le programme pour accomplir une tâche simple :
             afficher ce hello world !
         </p>
-
-        <p><a href=\"";
-        // line 18
-        echo twig_escape_filter($this->env, $this->env->getExtension('routing')->getPath("oc_platform_view", array("id" => (isset($context["id"]) ? $context["id"] : $this->getContext($context, "id")))), "html", null, true);
-        echo "\">Lien vers l'annonce d'id ";
-        echo twig_escape_filter($this->env, (isset($context["id"]) ? $context["id"] : $this->getContext($context, "id")), "html", null, true);
-        echo "</a></p>
     </body>
 </html>";
     }
@@ -59,6 +52,6 @@ class __TwigTemplate_569ec9cea14741c72ddc7fd0970ddd2a123df0908c137c1463ad3a08c72
 
     public function getDebugInfo()
     {
-        return array (  42 => 18,  30 => 9,  21 => 2,  19 => 1,);
+        return array (  30 => 9,  21 => 2,  19 => 1,);
     }
 }
