@@ -3,7 +3,7 @@
  * @Author: Mehdi
  * @Date:   2014-11-15 16:33:06
  * @Last Modified by:   Mehdi
- * @Last Modified time: 2014-11-15 20:09:07
+ * @Last Modified time: 2014-11-15 22:17:27
  */
 
 //src/OC/PlatformBundle/Controller/AdvertController.php
@@ -50,19 +50,49 @@ class AdvertController extends Controller{
 		//Traitement -> récupération de la liste des annonces 
 		//qu'on passera au template pour l'afficher
 		
+		$listAdverts = array(
+	      array(
+	        'title'   => 'Recherche développpeur Symfony2',
+	        'id'      => 1,
+	        'author'  => 'Alexandre',
+	        'content' => 'Nous recherchons un développeur Symfony2 débutant sur Lyon. Blabla…',
+	        'date'    => new \Datetime()),
+	      array(
+	        'title'   => 'Mission de webmaster',
+	        'id'      => 2,
+	        'author'  => 'Hugo',
+	        'content' => 'Nous recherchons un webmaster capable de maintenir notre site internet. Blabla…',
+	        'date'    => new \Datetime()),
+	      array(
+	        'title'   => 'Offre de stage webdesigner',
+	        'id'      => 3,
+	        'author'  => 'Mathieu',
+	        'content' => 'Nous proposons un poste pour webdesigner. Blabla…',
+	        'date'    => new \Datetime())
+	    );
 		//Affichage du template
-		return $this->render('OCPlatformBundle:Advert:index.html.twig');
-	}
+		return $this->render('OCPlatformBundle:Advert:index.html.twig', array(
+		  'listAdverts' => $listAdverts
+		));	}
 
 	/**
 	 * affiche l'annonce correspondant à l'id $id
 	 * @param  [int] $id [clé id de l'annonce]
 	 * @return [render]     [template de vue]
 	 */
-	public function viewAction($id){
+	public function viewAction($id)
+	{
+		$advert = array(
+		  'title'   => 'Recherche développpeur Symfony2',
+		  'id'      => $id,
+		  'author'  => 'Alexandre',
+		  'content' => 'Nous recherchons un développeur Symfony2 débutant sur Lyon. Blabla…',
+		  'date'    => new \Datetime()
+		);
 
-		return $this->render('OCPlatformBundle:Advert:view.html.twg', array('id' => $id));
-	
+		return $this->render('OCPlatformBundle:Advert:view.html.twig', array(
+		  'advert' => $advert
+		));
 	}
 
 	/**
@@ -90,19 +120,21 @@ class AdvertController extends Controller{
 	 * @param  Request $request 
 	 * @return [vue d'édition ou vue de l'annonce]
 	 */
-	public function editAction($id, Request $request){ //méthode appellée par le noyau
-		//
-		//Récupération de l'annonce d'id $id
-		//
-		
-		if($request->isMethod('POST')){
+	public function editAction($id, Request $request)
+	{
+		// ...
 
-			$request->getSession()->getFlashBag()->add('notice', 'Annonce bien modifiée.');
-			return $this->redirect($this->generateUrl('oc_platform_view', array('id' => 5)));
-		}
+		$advert = array(
+		  'title'   => 'Recherche développpeur Symfony2',
+		  'id'      => $id,
+		  'author'  => 'Alexandre',
+		  'content' => 'Nous recherchons un développeur Symfony2 débutant sur Lyon. Blabla…',
+		  'date'    => new \Datetime()
+		);
 
-		//Si not POST -> formulaire d'édition
-		return $this->render('OCPlatformBundle:Advert:edit.html.twig');
+		return $this->render('OCPlatformBundle:Advert:edit.html.twig', array(
+		  'advert' => $advert
+		));
 	}
 
 	public function deleteAction($id){ //méthode appellée par le noyau
@@ -116,6 +148,26 @@ class AdvertController extends Controller{
 		
 		return $this->render('OCPlatformBundle:Advert:delete.html.twig');
 	}	
+
+	/**
+	 * Récupération des annonces et passage au template pour l'affichage
+	 * @return [template] [advert listing]
+	 */
+	public function menuAction($limit){
+
+		//On créée une liste pour tester, mais à terme on passera par une BDD
+		$listAdverts = array(
+			array('id' => 2, 'title' => 'Recherche développeur Symfony2'),			
+			array('id' => 5, 'title' => 'Mission de webmaster'),
+			array('id' => 9, 'title' => 'Ofre de stage webdesigner')
+		);
+
+		//le contrôleur passe les variables nécessaires au template
+		return $this->render(
+			'OCPlatformBundle:Advert:menu.html.twig', 
+			array('listAdverts' => $listAdverts)
+		);
+	}
 }
 
 

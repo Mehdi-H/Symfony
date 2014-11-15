@@ -1,4 +1,4 @@
-﻿oc_platform_home:
+oc_platform_home:
     path:    /{page}
     defaults:    { _controller: OCPlatformBundle:Advert:index, page: 1 }
     requirements:
