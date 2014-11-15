@@ -1673,7 +1673,7 @@ class appDevDebugProjectContainer extends Container
      */
     protected function getOcPlatform_AntispamService()
     {
-        return $this->services['oc_platform.antispam'] = new \OC\PlatformBundle\Antispam\OCAntispam();
+        return $this->services['oc_platform.antispam'] = new \OC\PlatformBundle\Antispam\OCAntispam($this->get('swiftmailer.mailer.default'), 'en', 50);
     }
 
     /**
