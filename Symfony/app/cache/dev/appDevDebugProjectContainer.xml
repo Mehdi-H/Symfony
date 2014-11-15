@@ -2464,6 +2464,7 @@
       <argument type="service" id="security.authentication.trust_resolver" on-invalid="null"/>
       <argument type="service" id="security.role_hierarchy" on-invalid="null"/>
     </service>
+    <service id="oc_platform.antispam" class="OC\PlatformBundle\Antispam\OCAntispam"/>
     <service id="web_profiler.controller.profiler" class="Symfony\Bundle\WebProfilerBundle\Controller\ProfilerController">
       <argument type="service" id="router" on-invalid="null"/>
       <argument type="service" id="profiler" on-invalid="null"/>

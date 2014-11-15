@@ -133,6 +133,7 @@ class appDevDebugProjectContainer extends Container
             'monolog.logger.scream' => 'getMonolog_Logger_ScreamService',
             'monolog.logger.security' => 'getMonolog_Logger_SecurityService',
             'monolog.logger.templating' => 'getMonolog_Logger_TemplatingService',
+            'oc_platform.antispam' => 'getOcPlatform_AntispamService',
             'profiler' => 'getProfilerService',
             'profiler_listener' => 'getProfilerListenerService',
             'property_accessor' => 'getPropertyAccessorService',
@@ -1660,6 +1661,19 @@ class appDevDebugProjectContainer extends Container
         $instance->pushHandler($this->get('monolog.handler.debug'));
 
         return $instance;
+    }
+
+    /**
+     * Gets the 'oc_platform.antispam' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \OC\PlatformBundle\Antispam\OCAntispam A OC\PlatformBundle\Antispam\OCAntispam instance.
+     */
+    protected function getOcPlatform_AntispamService()
+    {
+        return $this->services['oc_platform.antispam'] = new \OC\PlatformBundle\Antispam\OCAntispam();
     }
 
     /**

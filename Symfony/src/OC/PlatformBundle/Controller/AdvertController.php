@@ -3,7 +3,7 @@
  * @Author: Mehdi
  * @Date:   2014-11-15 16:33:06
  * @Last Modified by:   Mehdi
- * @Last Modified time: 2014-11-15 22:17:27
+ * @Last Modified time: 2014-11-16 00:38:53
  */
 
 //src/OC/PlatformBundle/Controller/AdvertController.php
@@ -104,12 +104,24 @@ class AdvertController extends Controller{
 		if($request->isMethod('POST')){
 			//Traitement: création et gestion du formulaire d'ajout
 			//
+			
+			$antispam = $this->container->get('oc_platform.antispam'); //récupération du service antispam
+			$text = '...';
+			if($antispam->isSpam($text)){
+				throw new \Exception('Votre message a été détecté comme spam !');
+			}
+
 			$request->getSession()->getFlashBag()->add('notice', 'Annonce bien enregistrée.'); //message flash: tout est OK
 
 			//Redirection vers la page de visu de cette annonce
 			return $this->redirect($this->generateUrl('oc_platform_view', array('id' => 5)));
 		}
 
+		$antispam = $this->container->get('oc_platform.antispam'); //récupération du service antispam
+			$text = '...';
+			if($antispam->isSpam($text)){
+				throw new \Exception('Votre message a été détecté comme spam !');
+			}
 		//si not POST, on affiche le formulaire
 		return $this->render('OCPlatformBundle:Advert:add.html.twig');
 	}
