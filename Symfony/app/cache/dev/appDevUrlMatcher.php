@@ -122,9 +122,33 @@ class appDevUrlMatcher extends Symfony\Bundle\FrameworkBundle\Routing\Redirectab
 
         }
 
-        // ﻿hello_the_world
-        if ($pathinfo === '/hello-world') {
-            return array (  '_controller' => 'OC\\PlatformBundle\\Controller\\AdvertController::indexAction',  '_route' => '﻿hello_the_world',);
+        if (0 === strpos($pathinfo, '/platform')) {
+            if (0 === strpos($pathinfo, '/platform/platform')) {
+                // ﻿oc_platform_home
+                if ($pathinfo === '/platform/platform') {
+                    return array (  '_controller' => 'OC\\PlatformBundle\\Controller\\AdvertController::indexAction',  '_route' => '﻿oc_platform_home',);
+                }
+
+                if (0 === strpos($pathinfo, '/platform/platform/ad')) {
+                    // oc_platform_view
+                    if (0 === strpos($pathinfo, '/platform/platform/advert') && preg_match('#^/platform/platform/advert/(?P<id>[^/]++)$#s', $pathinfo, $matches)) {
+                        return $this->mergeDefaults(array_replace($matches, array('_route' => 'oc_platform_view')), array (  '_controller' => 'OC\\PlatformBundle\\Controller\\AdvertController::viewAction',));
+                    }
+
+                    // oc_platform_add
+                    if ($pathinfo === '/platform/platform/add') {
+                        return array (  '_controller' => 'OC\\PlatformBundle\\Controller\\AdvertController::addAction',  '_route' => 'oc_platform_add',);
+                    }
+
+                }
+
+            }
+
+            // oc_platform_view_slug
+            if (preg_match('#^/platform/(?P<year>\\d{4})/(?P<slug>[^/\\.]++)(?:\\.(?P<format>html|xml))?$#s', $pathinfo, $matches)) {
+                return $this->mergeDefaults(array_replace($matches, array('_route' => 'oc_platform_view_slug')), array (  '_controller' => 'OC\\PlatformBundle\\Controller\\AdvertController::viewSlugAction',  'format' => 'html',));
+            }
+
         }
 
         throw 0 < count($allow) ? new MethodNotAllowedException(array_unique($allow)) : new ResourceNotFoundException();
