@@ -123,23 +123,24 @@ class appDevUrlMatcher extends Symfony\Bundle\FrameworkBundle\Routing\Redirectab
         }
 
         if (0 === strpos($pathinfo, '/platform')) {
-            if (0 === strpos($pathinfo, '/platform/platform')) {
-                // ﻿oc_platform_home
-                if ($pathinfo === '/platform/platform') {
-                    return array (  '_controller' => 'OC\\PlatformBundle\\Controller\\AdvertController::indexAction',  '_route' => '﻿oc_platform_home',);
+            // ﻿oc_platform_home
+            if (rtrim($pathinfo, '/') === '/platform') {
+                if (substr($pathinfo, -1) !== '/') {
+                    return $this->redirect($pathinfo.'/', '﻿oc_platform_home');
                 }
 
-                if (0 === strpos($pathinfo, '/platform/platform/ad')) {
-                    // oc_platform_view
-                    if (0 === strpos($pathinfo, '/platform/platform/advert') && preg_match('#^/platform/platform/advert/(?P<id>[^/]++)$#s', $pathinfo, $matches)) {
-                        return $this->mergeDefaults(array_replace($matches, array('_route' => 'oc_platform_view')), array (  '_controller' => 'OC\\PlatformBundle\\Controller\\AdvertController::viewAction',));
-                    }
+                return array (  '_controller' => 'OC\\PlatformBundle\\Controller\\AdvertController::indexAction',  '_route' => '﻿oc_platform_home',);
+            }
 
-                    // oc_platform_add
-                    if ($pathinfo === '/platform/platform/add') {
-                        return array (  '_controller' => 'OC\\PlatformBundle\\Controller\\AdvertController::addAction',  '_route' => 'oc_platform_add',);
-                    }
+            if (0 === strpos($pathinfo, '/platform/ad')) {
+                // oc_platform_view
+                if (0 === strpos($pathinfo, '/platform/advert') && preg_match('#^/platform/advert/(?P<id>[^/]++)$#s', $pathinfo, $matches)) {
+                    return $this->mergeDefaults(array_replace($matches, array('_route' => 'oc_platform_view')), array (  '_controller' => 'OC\\PlatformBundle\\Controller\\AdvertController::viewAction',));
+                }
 
+                // oc_platform_add
+                if ($pathinfo === '/platform/add') {
+                    return array (  '_controller' => 'OC\\PlatformBundle\\Controller\\AdvertController::addAction',  '_route' => 'oc_platform_add',);
                 }
 
             }

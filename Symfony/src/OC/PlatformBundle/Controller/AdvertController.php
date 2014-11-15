@@ -3,7 +3,7 @@
  * @Author: Mehdi
  * @Date:   2014-11-15 16:33:06
  * @Last Modified by:   Mehdi
- * @Last Modified time: 2014-11-15 17:38:50
+ * @Last Modified time: 2014-11-15 18:05:16
  */
 
 //src/OC/PlatformBundle/Controller/AdvertController.php
@@ -21,7 +21,8 @@ class AdvertController extends Controller{
 	//Route OCPlatformBundle:Advert:view avec path /platform/advert/{id}
 	//=> besoin d'une méthode viewAction($id)
 	public function viewAction($id){
-		return new Response("Voici l'annonce d'id : ".$id);
+		$content = $this->get('templating')->render('OCPlatformBundle:Advert:index.html.twig', array('nom' => 'Mehdi', 'id' => $id));
+		return new Response($content);
 	}
 
 	//Route OCPlatformBundle:Advert:viewSlug 

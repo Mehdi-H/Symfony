@@ -1,5 +1,5 @@
 ﻿oc_platform_home:
-    path:    
+    path:    /
     defaults:    { _controller: OCPlatformBundle:Advert:index }
 
 oc_platform_view:
