@@ -3,7 +3,7 @@
  * @Author: Mehdi
  * @Date:   2014-11-15 16:33:06
  * @Last Modified by:   Mehdi
- * @Last Modified time: 2014-11-16 00:38:53
+ * @Last Modified time: 2014-11-16 11:08:04
  */
 
 //src/OC/PlatformBundle/Controller/AdvertController.php
@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Response; //utilis° de l'objet Response av
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use OC\PlatformBundle\Entity\Advert;
 
 //=====CLASSE=====
 class AdvertController extends Controller{ 
@@ -101,27 +102,46 @@ class AdvertController extends Controller{
 	 */
 	public function addAction(Request $request){
 
+		//Création de l'entité
+		$advert = new Advert();
+		//Paramétrage de l'entité
+		$advert->setTitle('Recherche développeur Symfony2.');
+		$advert->setAuthor('Alexandre');
+		$advert->setContent('Nous recherchons un développeur Symfony2 sur la région de Lyon, blabla...');			
+		//la date et la publication ne sont pas définis ici mais dans le constructeur, automatiquement
+		
+		//Ensuite on récupère l'EntityManager
+		$doctrine = $this->getDoctrine();
+		$em = $doctrine->getManager();
+
+		//Puis on persiste l'entité et on flush ce qui a été persisté avant
+		$em->persist($advert); //cette entité est maintenant gérée par Doctrine
+		$em->flush(); //cet advert est enregistrée en base de donnée,
+					  // et Doctrine2 lui a attribué un id récupérable par getId()
+
 		if($request->isMethod('POST')){
-			//Traitement: création et gestion du formulaire d'ajout
-			//
-			
-			$antispam = $this->container->get('oc_platform.antispam'); //récupération du service antispam
-			$text = '...';
-			if($antispam->isSpam($text)){
-				throw new \Exception('Votre message a été détecté comme spam !');
-			}
+
+			// $antispam = $this->container->get('oc_platform.antispam'); //récupération du service antispam
+			// $text = '...';
+			// if($antispam->isSpam($text)){
+			// 	throw new \Exception('Votre message a été détecté comme spam !');
+			// }
 
 			$request->getSession()->getFlashBag()->add('notice', 'Annonce bien enregistrée.'); //message flash: tout est OK
 
 			//Redirection vers la page de visu de cette annonce
-			return $this->redirect($this->generateUrl('oc_platform_view', array('id' => 5)));
+			return $this->redirect(
+						$this->generateUrl('oc_platform_view', array('id' => $advert->getId())
+							)
+						);
 		}
 
-		$antispam = $this->container->get('oc_platform.antispam'); //récupération du service antispam
-			$text = '...';
-			if($antispam->isSpam($text)){
-				throw new \Exception('Votre message a été détecté comme spam !');
-			}
+		//Test if spam fonctionnel
+		// $antispam = $this->container->get('oc_platform.antispam'); //récupération du service antispam
+		// $text = '...';
+		// if($antispam->isSpam($text)){
+		// 	throw new \Exception('Votre message a été détecté comme spam !');
+		// }
 		//si not POST, on affiche le formulaire
 		return $this->render('OCPlatformBundle:Advert:add.html.twig');
 	}
