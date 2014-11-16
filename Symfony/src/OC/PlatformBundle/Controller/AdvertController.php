@@ -3,7 +3,7 @@
  * @Author: Mehdi
  * @Date:   2014-11-15 16:33:06
  * @Last Modified by:   Mehdi
- * @Last Modified time: 2014-11-16 12:37:58
+ * @Last Modified time: 2014-11-16 14:32:26
  */
 
 //src/OC/PlatformBundle/Controller/AdvertController.php
@@ -18,6 +18,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use OC\PlatformBundle\Entity\Advert;
+use OC\PlatformBundle\Entity\Image;
+use OC\PlatformBundle\Entity\Application;
 
 //=====CLASSE=====
 class AdvertController extends Controller{ 
@@ -83,26 +85,32 @@ class AdvertController extends Controller{
 	 */
 	public function viewAction($id)
 	{
-		//on récupère le repository Advert
-		$repository = $this
-		->getDoctrine()
-		->getManager()
-		->getRepository('OCPlatformBundle:Advert')
-		;
+		$em = $this->getDoctrine()->getManager();
 
-		//on récupère l'entité annonce qui correspond à l'id $id
-		$advert = $repository->find($id);
-		//=> soit $advert est bien une instance de OC\PlatformBundle\Entity\Advert...
+	    // On récupère l'annonce $id
+	    $advert = $em
+	      ->getRepository('OCPlatformBundle:Advert')
+	      ->find($id)
+	    ;
 		
 		//soit $advert est null si $id n'est pas répertorié
 		if (null === $advert){
 			throw new NotFoundHttpException("L'annonce d'id ".$id." n'existe pas.");
 		}
 
+		//on récupère la liste des candidatures pour cette annonce
+		$listApplications = $em
+		->getRepository('OCPlatformBundle:Application')
+		->findBy(array('advert' => $advert))
+		;
+
 		return $this
 		->render(
 			'OCPlatformBundle:Advert:view.html.twig', 
-			array('advert' => $advert)
+			array(
+				'advert'           => $advert,
+				'listApplications' => $listApplications
+				)
 		);
 		
 	}
@@ -113,7 +121,7 @@ class AdvertController extends Controller{
 	 */
 	public function addAction(Request $request){
 
-		//Création de l'entité
+		//Création de l'entité Advert
 		$advert = new Advert();
 		//Paramétrage de l'entité
 		$advert->setTitle('Recherche développeur Symfony2.');
@@ -121,12 +129,46 @@ class AdvertController extends Controller{
 		$advert->setContent('Nous recherchons un développeur Symfony2 sur la région de Lyon, blabla...');			
 		//la date et la publication ne sont pas définis ici mais dans le constructeur, automatiquement
 		
+		//Création de l'entité Image associée à l'Advert
+		$image = new Image();
+		$image->setUrl('http://sdz-upload.s3.amazonaws.com/prod/upload/job-de-reve.jpg');
+		$image->setAlt('Job de rêve');
+
+		//Il faut lier l'image à l'annonce
+		$advert->setImage($image);
+
+		//Création d"une première candidature
+		$application1 = new Application();
+		$application1->setAuthor('Marine');
+		$application1->setContent('Je suis une pro de Symfony2.');
+
+		//Création d"une deuxième candidature d'exemple
+		$application2 = new Application();
+		$application2->setAuthor('Pierre');
+		$application2->setContent('Embauchez-moi, je suis très motivé.');
+
+		//Il faut lier ces candidatures à l'annonce
+		$application1->setAdvert($advert);
+		$application2->setAdvert($advert);
+
 		//Ensuite on récupère l'EntityManager
 		$doctrine = $this->getDoctrine();
 		$em = $doctrine->getManager();
 
 		//Puis on persiste l'entité et on flush ce qui a été persisté avant
 		$em->persist($advert); //cette entité est maintenant gérée par Doctrine
+
+		// si on n'avait pas défini le cascade={"persist"},
+	    // on devrait persister à la main l'entité $image
+	    // $em->persist($image);
+	    
+	    //pour cette relation avec les candidatures, 
+	    //pas de cascade lorsqu'on persiste Advert, car la relation est
+    	// définie dans l'entité Application et non Advert. 
+    	// On doit donc tout persister à la main ici.
+    	$em->persist($application1);
+    	$em->persist($application2);
+    
 		$em->flush(); //cet advert est enregistrée en base de donnée,
 					  // et Doctrine2 lui a attribué un id récupérable par getId()
 
@@ -154,7 +196,12 @@ class AdvertController extends Controller{
 		// 	throw new \Exception('Votre message a été détecté comme spam !');
 		// }
 		//si not POST, on affiche le formulaire
-		return $this->render('OCPlatformBundle:Advert:add.html.twig');
+		// return $this->render('OCPlatformBundle:Advert:add.html.twig');
+		//Redirection vers la page de visu de cette annonce
+		return $this->redirect(
+					$this->generateUrl('oc_platform_view', array('id' => $advert->getId())
+						)
+					);
 	}
 
 	/**
@@ -210,6 +257,22 @@ class AdvertController extends Controller{
 			'OCPlatformBundle:Advert:menu.html.twig', 
 			array('listAdverts' => $listAdverts)
 		);
+	}
+
+	public function editImageAction($advertId){
+		$em = $this->getDoctrine()->getManager();
+
+		$advert = $em->getRepository('OCPlatformBundle:Advert')->find($advertId);
+
+		$advert->getImage()->setImage('test.png');
+
+		// On n'a pas besoin de persister l'annonce ni l'image.
+		// ces entités sont automatiquement persistées car
+		// on les a récupérées depuis Doctrine lui-même
+		
+		$em->flush();
+
+		return new Response("L'image a bien été modifiée.");
 	}
 }
 
