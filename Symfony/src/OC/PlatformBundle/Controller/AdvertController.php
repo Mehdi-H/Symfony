@@ -3,7 +3,7 @@
  * @Author: Mehdi
  * @Date:   2014-11-15 16:33:06
  * @Last Modified by:   Mehdi
- * @Last Modified time: 2014-11-16 11:08:04
+ * @Last Modified time: 2014-11-16 12:37:58
  */
 
 //src/OC/PlatformBundle/Controller/AdvertController.php
@@ -83,17 +83,28 @@ class AdvertController extends Controller{
 	 */
 	public function viewAction($id)
 	{
-		$advert = array(
-		  'title'   => 'Recherche développpeur Symfony2',
-		  'id'      => $id,
-		  'author'  => 'Alexandre',
-		  'content' => 'Nous recherchons un développeur Symfony2 débutant sur Lyon. Blabla…',
-		  'date'    => new \Datetime()
-		);
+		//on récupère le repository Advert
+		$repository = $this
+		->getDoctrine()
+		->getManager()
+		->getRepository('OCPlatformBundle:Advert')
+		;
 
-		return $this->render('OCPlatformBundle:Advert:view.html.twig', array(
-		  'advert' => $advert
-		));
+		//on récupère l'entité annonce qui correspond à l'id $id
+		$advert = $repository->find($id);
+		//=> soit $advert est bien une instance de OC\PlatformBundle\Entity\Advert...
+		
+		//soit $advert est null si $id n'est pas répertorié
+		if (null === $advert){
+			throw new NotFoundHttpException("L'annonce d'id ".$id." n'existe pas.");
+		}
+
+		return $this
+		->render(
+			'OCPlatformBundle:Advert:view.html.twig', 
+			array('advert' => $advert)
+		);
+		
 	}
 
 	/**
