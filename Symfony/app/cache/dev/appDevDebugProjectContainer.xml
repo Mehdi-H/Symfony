@@ -20,6 +20,7 @@
       <parameter key="WebProfilerBundle">Symfony\Bundle\WebProfilerBundle\WebProfilerBundle</parameter>
       <parameter key="SensioDistributionBundle">Sensio\Bundle\DistributionBundle\SensioDistributionBundle</parameter>
       <parameter key="SensioGeneratorBundle">Sensio\Bundle\GeneratorBundle\SensioGeneratorBundle</parameter>
+      <parameter key="DoctrineFixturesBundle">Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle</parameter>
     </parameter>
     <parameter key="kernel.charset">UTF-8</parameter>
     <parameter key="kernel.container_class">appDevDebugProjectContainer</parameter>
@@ -526,10 +527,6 @@
     <parameter key="web_profiler.debug_toolbar.intercept_redirects">false</parameter>
     <parameter key="web_profiler.debug_toolbar.mode">2</parameter>
     <parameter key="sensio_distribution.webconfigurator.class">Sensio\Bundle\DistributionBundle\Configurator\Configurator</parameter>
-    <parameter key="sensio_distribution.webconfigurator.doctrine_step.class">Sensio\Bundle\DistributionBundle\Configurator\Step\DoctrineStep</parameter>
-    <parameter key="sensio_distribution.webconfigurator.secret_step.class">Sensio\Bundle\DistributionBundle\Configurator\Step\SecretStep</parameter>
-    <parameter key="sensio_distribution.security_checker.class">SensioLabs\Security\SecurityChecker</parameter>
-    <parameter key="sensio_distribution.security_checker.command.class">SensioLabs\Security\Command\SecurityCheckerCommand</parameter>
     <parameter key="data_collector.templates" type="collection">
       <parameter key="data_collector.config" type="collection">
         <parameter>config</parameter>
@@ -580,9 +577,7 @@
         <parameter>DoctrineBundle:Collector:db</parameter>
       </parameter>
     </parameter>
-    <parameter key="console.command.ids" type="collection">
-      <parameter>sensio_distribution.security_checker.command</parameter>
-    </parameter>
+    <parameter key="console.command.ids" type="collection"/>
   </parameters>
   <services>
     <service id="controller_name_converter" class="Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser" public="false">
@@ -2559,27 +2554,6 @@
     </service>
     <service id="sensio_distribution.webconfigurator" class="Sensio\Bundle\DistributionBundle\Configurator\Configurator">
       <argument>C:/wamp/www/Symfony/app</argument>
-      <call method="addStep">
-        <argument type="service">
-          <service class="Sensio\Bundle\DistributionBundle\Configurator\Step\DoctrineStep" public="false">
-            <tag name="webconfigurator.step" priority="10"/>
-          </service>
-        </argument>
-        <argument>10</argument>
-      </call>
-      <call method="addStep">
-        <argument type="service">
-          <service class="Sensio\Bundle\DistributionBundle\Configurator\Step\SecretStep" public="false">
-            <tag name="webconfigurator.step"/>
-          </service>
-        </argument>
-        <argument>0</argument>
-      </call>
-    </service>
-    <service id="sensio_distribution.security_checker" class="SensioLabs\Security\SecurityChecker"/>
-    <service id="sensio_distribution.security_checker.command" class="SensioLabs\Security\Command\SecurityCheckerCommand">
-      <tag name="console.command"/>
-      <argument type="service" id="sensio_distribution.security_checker"/>
     </service>
     <service id="monolog.logger.request" class="Symfony\Bridge\Monolog\Logger">
       <argument>request</argument>
@@ -2928,6 +2902,5 @@
     <service id="database_connection" alias="doctrine.dbal.default_connection"/>
     <service id="doctrine.orm.entity_manager" alias="doctrine.orm.default_entity_manager"/>
     <service id="sensio.distribution.webconfigurator" alias="sensio_distribution.webconfigurator"/>
-    <service id="console.command.sensiolabs_security_command_securitycheckercommand" alias="sensio_distribution.security_checker.command"/>
   </services>
 </container>

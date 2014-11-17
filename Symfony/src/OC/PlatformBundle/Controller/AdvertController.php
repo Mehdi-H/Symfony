@@ -3,7 +3,7 @@
  * @Author: Mehdi
  * @Date:   2014-11-15 16:33:06
  * @Last Modified by:   Mehdi
- * @Last Modified time: 2014-11-16 14:32:26
+ * @Last Modified time: 2014-11-16 18:37:56
  */
 
 //src/OC/PlatformBundle/Controller/AdvertController.php
@@ -212,30 +212,52 @@ class AdvertController extends Controller{
 	 */
 	public function editAction($id, Request $request)
 	{
-		// ...
+		$em = $this->getDoctrine()->getManager();
 
-		$advert = array(
-		  'title'   => 'Recherche développpeur Symfony2',
-		  'id'      => $id,
-		  'author'  => 'Alexandre',
-		  'content' => 'Nous recherchons un développeur Symfony2 débutant sur Lyon. Blabla…',
-		  'date'    => new \Datetime()
-		);
+		//on récupère l'annonce d'id $id
+		$advert = $em->getRepository('OCPlatformBundle:Advert')->find($id);
 
-		return $this->render('OCPlatformBundle:Advert:edit.html.twig', array(
+		if( null === $advert){ //si l'id $id ne correspond à aucun id d'annonce
+			throw new NotFoundHttpException("L'annonce d'id ".$id." n'existe pas.");
+		}
+
+		//on récupère toutes les catégories avec findAll
+		$listCategories = $em->getRepository('OCPlatformBundle:Category')->findAll();
+
+		//on boucle sur les catégories pour les lier à cette annonce
+		foreach ($listCategories as $category) {
+			$advert->addCategory($category);
+		}
+
+		//Persistance:
+		// Pour persister le changement dans la relation, 
+		// il faut persister l'entité propriétaire
+   		// Ici, Advert est le propriétaire, donc 
+   		// inutile de la persister car on l'a récupérée depuis Doctrine
+   		
+   		$em->flush(); //enregistrement
+
+		return $this->render('OCPlatformBundle:Advert:view.html.twig', array(
 		  'advert' => $advert
 		));
 	}
 
 	public function deleteAction($id){ //méthode appellée par le noyau
-		//
-		//On récupère l'annonce d'id $id à supprimer
-		//
 		
-		//
-		//on la supprime
-		//
-		
+		$em = $this->getDoctrine()->getManager();
+
+		$advert = $em->getRepository('OCPlatformBundle:Advert')->find('$id');
+
+		if (null === $advert) {
+			throw new NotFoundHttpException("L'annonce d'id ".$id." n'existe pas.");
+		}
+
+		foreach ($listCategories as $category) {
+			$advert->removeCategory($category);
+		}
+
+		$em->flush();
+
 		return $this->render('OCPlatformBundle:Advert:delete.html.twig');
 	}	
 

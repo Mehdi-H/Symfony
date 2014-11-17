@@ -13,7 +13,7 @@ if [ ! $1 ]; then
 fi
 
 if [ ! $2 ]; then
-    echo "\033[37;41mYou must pass the version to build\033[0m"
+    echo "\033[37;41mYou must pass the branch to build\033[0m"
     exit 1
 fi
 
@@ -32,21 +32,17 @@ fi
 # avoid the creation of ._* files
 export COPY_EXTENDED_ATTRIBUTES_DISABLE=true
 export COPYFILE_DISABLE=true
-export SENSIOLABS_FORCE_ACME_DEMO=true
 
 # Temp dir
 rm -rf /tmp/Symfony
 mkdir /tmp/Symfony
 
-# Create project
-composer.phar create-project -n symfony/framework-standard-edition /tmp/Symfony $2
-
-if [ 0 -ne $? ]; then
-    echo "\033[37;41mVersion $2 does not exist\033[0m"
-    exit 1
-fi
-
+# Clone
 cd /tmp/Symfony
+git clone https://github.com/symfony/symfony-standard.git .
+git reset --hard origin/$2
+
+composer.phar update --prefer-dist -n
 
 # cleanup
 sudo rm -rf app/cache/* app/logs/* .git*
@@ -81,11 +77,7 @@ cd $TARGET/swiftmailer/swiftmailer && rm -rf CHANGES README* build* docs notes t
 
 # Symfony
 cd $TARGET/symfony/symfony && rm -rf README.md phpunit.xml* tests *.sh vendor
-if [ -d $TARGET/symfony/assetic-bundle/Symfony/Bundle/AsseticBundle ]; then
-    cd $TARGET/symfony/assetic-bundle/Symfony/Bundle/AsseticBundle && rm -rf Tests Resources/doc
-else
-    cd $TARGET/symfony/assetic-bundle && rm -rf Tests Resources/doc
-fi
+cd $TARGET/symfony/assetic-bundle/Symfony/Bundle/AsseticBundle && rm -rf Tests Resources/doc
 cd $TARGET/symfony/swiftmailer-bundle/Symfony/Bundle/SwiftmailerBundle && rm -rf Tests Resources/doc
 if [ -d $TARGET/symfony/monolog-bundle/Symfony/Bundle/MonologBundle ]; then
     cd $TARGET/symfony/monolog-bundle/Symfony/Bundle/MonologBundle && rm -rf Tests Resources/doc
