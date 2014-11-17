@@ -3,7 +3,7 @@
  * @Author: Mehdi
  * @Date:   2014-11-15 16:33:06
  * @Last Modified by:   Mehdi
- * @Last Modified time: 2014-11-16 18:37:56
+ * @Last Modified time: 2014-11-17 21:45:29
  */
 
 //src/OC/PlatformBundle/Controller/AdvertController.php
@@ -20,6 +20,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use OC\PlatformBundle\Entity\Advert;
 use OC\PlatformBundle\Entity\Image;
 use OC\PlatformBundle\Entity\Application;
+use OC\PlatformBundle\Entity\AdvertSkill;
 
 //=====CLASSE=====
 class AdvertController extends Controller{ 
@@ -100,8 +101,14 @@ class AdvertController extends Controller{
 
 		//on récupère la liste des candidatures pour cette annonce
 		$listApplications = $em
-		->getRepository('OCPlatformBundle:Application')
-		->findBy(array('advert' => $advert))
+			->getRepository('OCPlatformBundle:Application')
+			->findBy(array('advert' => $advert))
+		;
+
+		//on récupère la liste des AdvertSkill
+		$listAdvertSkills = $em
+			->getRepository('OCPlatformBundle:AdvertSkill')
+			->findBy(array('advert' => $advert))
 		;
 
 		return $this
@@ -109,7 +116,8 @@ class AdvertController extends Controller{
 			'OCPlatformBundle:Advert:view.html.twig', 
 			array(
 				'advert'           => $advert,
-				'listApplications' => $listApplications
+				'listApplications' => $listApplications,
+				'listAdvertSkills' => $listAdvertSkills
 				)
 		);
 		
@@ -131,20 +139,20 @@ class AdvertController extends Controller{
 		
 		//Création de l'entité Image associée à l'Advert
 		$image = new Image();
-		$image->setUrl('http://sdz-upload.s3.amazonaws.com/prod/upload/job-de-reve.jpg');
-		$image->setAlt('Job de rêve');
+		$image->setUrl('http://media.meltycampus.fr/article-1370046-ratio265_610/etudiants-job-de-reve-top-5.jpg');
+		$image->setAlt('Dream Job');
 
 		//Il faut lier l'image à l'annonce
 		$advert->setImage($image);
 
 		//Création d"une première candidature
 		$application1 = new Application();
-		$application1->setAuthor('Marine');
-		$application1->setContent('Je suis une pro de Symfony2.');
+		$application1->setAuthor('Laure');
+		$application1->setContent('J\'utilise Symfony2 depuis 3 ans.');
 
 		//Création d"une deuxième candidature d'exemple
 		$application2 = new Application();
-		$application2->setAuthor('Pierre');
+		$application2->setAuthor('John');
 		$application2->setContent('Embauchez-moi, je suis très motivé.');
 
 		//Il faut lier ces candidatures à l'annonce
@@ -154,6 +162,29 @@ class AdvertController extends Controller{
 		//Ensuite on récupère l'EntityManager
 		$doctrine = $this->getDoctrine();
 		$em = $doctrine->getManager();
+
+		//On récupère l'ensemble des compétences qui existent en base
+		$listSkills = $em->getRepository('OCPlatformBundle:Skill')->findAll();
+
+		foreach ($listSkills as $skill) {
+			
+			//On crée une nouvelle entité de type
+			//"relation entre 1 annonce et 1 compétence"
+			$advertSkill = new AdvertSkill();
+
+			//On lie cette entité à l'annonce
+			$advertSkill->setAdvert($advert);
+
+			//On la lie à la compétence courante dans cette boucle
+			$advertSkill->setSkill($skill);
+
+			//On pose un niveau requis
+			$advertSkill->setLevel('Chevalier Jedi du web au minimum');
+
+			//On n'oublie pas de persisté l'entité, 
+			//propriétaire dans ses 2 relations 1To1
+			$em->persist($advertSkill);
+		}
 
 		//Puis on persiste l'entité et on flush ce qui a été persisté avant
 		$em->persist($advert); //cette entité est maintenant gérée par Doctrine
