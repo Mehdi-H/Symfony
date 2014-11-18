@@ -3,7 +3,7 @@
  * @Author: Mehdi
  * @Date:   2014-11-15 16:33:06
  * @Last Modified by:   Mehdi
- * @Last Modified time: 2014-11-17 21:45:29
+ * @Last Modified time: 2014-11-18 20:49:54
  */
 
 //src/OC/PlatformBundle/Controller/AdvertController.php
@@ -93,6 +93,12 @@ class AdvertController extends Controller{
 	      ->getRepository('OCPlatformBundle:Advert')
 	      ->find($id)
 	    ;
+
+	    $repository = $this
+		    ->getDoctrine()
+		    ->getManager()
+		    ->getRepository('OCPlatformBundle:Advert')
+		  ;
 		
 		//soit $advert est null si $id n'est pas répertorié
 		if (null === $advert){
@@ -326,6 +332,18 @@ class AdvertController extends Controller{
 		$em->flush();
 
 		return new Response("L'image a bien été modifiée.");
+	}
+
+	public function listAction(){
+
+		$listAdverts = $this->getDoctrine()->getManager()
+			->getRepository('OCPlatformBundle:Advert')
+			->getAdvertWithApplications()
+		;
+
+		foreach ($listAdverts as $advert) {
+			$advert->getApplications();
+		}
 	}
 }
 
