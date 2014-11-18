@@ -3,7 +3,7 @@
  * @Author: Mehdi
  * @Date:   2014-11-15 16:33:06
  * @Last Modified by:   Mehdi
- * @Last Modified time: 2014-11-18 20:49:54
+ * @Last Modified time: 2014-11-18 21:19:22
  */
 
 //src/OC/PlatformBundle/Controller/AdvertController.php
@@ -124,7 +124,7 @@ class AdvertController extends Controller{
 				'advert'           => $advert,
 				'listApplications' => $listApplications,
 				'listAdvertSkills' => $listAdvertSkills
-				)
+			)
 		);
 		
 	}
@@ -138,14 +138,14 @@ class AdvertController extends Controller{
 		//Création de l'entité Advert
 		$advert = new Advert();
 		//Paramétrage de l'entité
-		$advert->setTitle('Recherche développeur Symfony2.');
+		$advert->setTitle('Recherche développeur web');
 		$advert->setAuthor('Alexandre');
-		$advert->setContent('Nous recherchons un développeur Symfony2 sur la région de Lyon, blabla...');			
+		$advert->setContent('Nous recherchons un développeur talentueux incessamment sous peu, c\'est urgent !');			
 		//la date et la publication ne sont pas définis ici mais dans le constructeur, automatiquement
 		
 		//Création de l'entité Image associée à l'Advert
 		$image = new Image();
-		$image->setUrl('http://media.meltycampus.fr/article-1370046-ratio265_610/etudiants-job-de-reve-top-5.jpg');
+		$image->setUrl('http://laurentzandjon.files.wordpress.com/2014/05/etam-job-de-reve-etam-job-ete-testeuse-maillot.jpg');
 		$image->setAlt('Dream Job');
 
 		//Il faut lier l'image à l'annonce
