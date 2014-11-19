@@ -99,6 +99,7 @@ class appProdProjectContainer extends Container
             'monolog.logger.router' => 'getMonolog_Logger_RouterService',
             'monolog.logger.security' => 'getMonolog_Logger_SecurityService',
             'oc_platform.antispam' => 'getOcPlatform_AntispamService',
+            'oc_platform.doctrine.notification' => 'getOcPlatform_Doctrine_NotificationService',
             'property_accessor' => 'getPropertyAccessorService',
             'request' => 'getRequestService',
             'request_stack' => 'getRequestStackService',
@@ -257,7 +258,9 @@ class appProdProjectContainer extends Container
     }
     protected function getDoctrine_Dbal_DefaultConnectionService()
     {
-        return $this->services['doctrine.dbal.default_connection'] = $this->get('doctrine.dbal.connection_factory')->createConnection(array('driver' => 'pdo_mysql', 'host' => 'localhost', 'port' => NULL, 'dbname' => 'symfony', 'user' => 'root', 'password' => NULL, 'charset' => 'UTF8', 'driverOptions' => array()), new \Doctrine\DBAL\Configuration(), new \Symfony\Bridge\Doctrine\ContainerAwareEventManager($this), array());
+        $a = new \Symfony\Bridge\Doctrine\ContainerAwareEventManager($this);
+        $a->addEventListener(array(0 => 'PostPersist'), $this->get('oc_platform.doctrine.notification'));
+        return $this->services['doctrine.dbal.default_connection'] = $this->get('doctrine.dbal.connection_factory')->createConnection(array('driver' => 'pdo_mysql', 'host' => 'localhost', 'port' => NULL, 'dbname' => 'symfony', 'user' => 'root', 'password' => NULL, 'charset' => 'UTF8', 'driverOptions' => array()), new \Doctrine\DBAL\Configuration(), $a, array());
     }
     protected function getDoctrine_Orm_DefaultEntityManagerService()
     {
@@ -602,6 +605,10 @@ class appProdProjectContainer extends Container
     protected function getOcPlatform_AntispamService()
     {
         return $this->services['oc_platform.antispam'] = new \OC\PlatformBundle\Antispam\OCAntispam($this->get('swiftmailer.mailer.default'), 'en', 50);
+    }
+    protected function getOcPlatform_Doctrine_NotificationService()
+    {
+        return $this->services['oc_platform.doctrine.notification'] = new \OC\PlatformBundle\DoctrineListener\ApplicationNotification($this->get('swiftmailer.mailer.default'));
     }
     protected function getPropertyAccessorService()
     {
