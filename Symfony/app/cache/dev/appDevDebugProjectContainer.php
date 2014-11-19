@@ -607,10 +607,14 @@ class appDevDebugProjectContainer extends Container
         $b = new \Doctrine\DBAL\Configuration();
         $b->setSQLLogger($a);
 
-        $c = new \Symfony\Bridge\Doctrine\ContainerAwareEventManager($this);
-        $c->addEventListener(array(0 => 'PostPersist'), $this->get('oc_platform.doctrine.notification'));
+        $c = new \Gedmo\Sluggable\SluggableListener();
+        $c->setAnnotationReader($this->get('annotation_reader'));
 
-        return $this->services['doctrine.dbal.default_connection'] = $this->get('doctrine.dbal.connection_factory')->createConnection(array('driver' => 'pdo_mysql', 'host' => 'localhost', 'port' => NULL, 'dbname' => 'symfony', 'user' => 'root', 'password' => NULL, 'charset' => 'UTF8', 'driverOptions' => array()), $b, $c, array());
+        $d = new \Symfony\Bridge\Doctrine\ContainerAwareEventManager($this);
+        $d->addEventSubscriber($c);
+        $d->addEventListener(array(0 => 'PostPersist'), $this->get('oc_platform.doctrine.notification'));
+
+        return $this->services['doctrine.dbal.default_connection'] = $this->get('doctrine.dbal.connection_factory')->createConnection(array('driver' => 'pdo_mysql', 'host' => 'localhost', 'port' => NULL, 'dbname' => 'symfony', 'user' => 'root', 'password' => NULL, 'charset' => 'UTF8', 'driverOptions' => array()), $b, $d, array());
     }
 
     /**

@@ -2348,6 +2348,16 @@
       <argument type="service">
         <service class="Symfony\Bridge\Doctrine\ContainerAwareEventManager" public="false">
           <argument type="service" id="service_container"/>
+          <call method="addEventSubscriber">
+            <argument type="service">
+              <service class="Gedmo\Sluggable\SluggableListener" public="false">
+                <tag name="doctrine.event_subscriber" connection="default"/>
+                <call method="setAnnotationReader">
+                  <argument type="service" id="annotation_reader"/>
+                </call>
+              </service>
+            </argument>
+          </call>
           <call method="addEventListener">
             <argument type="collection">
               <argument>PostPersist</argument>

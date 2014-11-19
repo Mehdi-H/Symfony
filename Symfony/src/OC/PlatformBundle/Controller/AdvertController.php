@@ -3,7 +3,7 @@
  * @Author: Mehdi
  * @Date:   2014-11-15 16:33:06
  * @Last Modified by:   Mehdi
- * @Last Modified time: 2014-11-18 21:19:22
+ * @Last Modified time: 2014-11-19 23:51:00
  */
 
 //src/OC/PlatformBundle/Controller/AdvertController.php
@@ -271,11 +271,17 @@ class AdvertController extends Controller{
 		// il faut persister l'entité propriétaire
    		// Ici, Advert est le propriétaire, donc 
    		// inutile de la persister car on l'a récupérée depuis Doctrine
+   		// 
+   		$listAdvertSkills = $em
+			->getRepository('OCPlatformBundle:AdvertSkill')
+			->findBy(array('advert' => $advert))
+		;
    		
    		$em->flush(); //enregistrement
 
 		return $this->render('OCPlatformBundle:Advert:view.html.twig', array(
-		  'advert' => $advert
+			'advert'           => $advert,
+			'listAdvertSkills' => $listAdvertSkills
 		));
 	}
 
