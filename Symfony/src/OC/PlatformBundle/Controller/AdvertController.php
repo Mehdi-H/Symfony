@@ -3,7 +3,7 @@
  * @Author: Mehdi
  * @Date:   2014-11-15 16:33:06
  * @Last Modified by:   Mehdi
- * @Last Modified time: 2014-11-19 23:51:00
+ * @Last Modified time: 2014-11-20 22:36:00
  */
 
 //src/OC/PlatformBundle/Controller/AdvertController.php
@@ -48,36 +48,36 @@ class AdvertController extends Controller{
 
 		if($page < 1){
 			//on balance un 404 pnf
-			throw new NotFoundHttpException('Page "'.$page.'" inexistante. ');
+			throw $this->createNotFoundException('La page "'.$page.'" n\'existe pas. ');
 		}
+
+		$nbPerPage = 3;
 
 		//Traitement -> récupération de la liste des annonces 
 		//qu'on passera au template pour l'afficher
 		
-		$listAdverts = array(
-	      array(
-	        'title'   => 'Recherche développpeur Symfony2',
-	        'id'      => 1,
-	        'author'  => 'Alexandre',
-	        'content' => 'Nous recherchons un développeur Symfony2 débutant sur Lyon. Blabla…',
-	        'date'    => new \Datetime()),
-	      array(
-	        'title'   => 'Mission de webmaster',
-	        'id'      => 2,
-	        'author'  => 'Hugo',
-	        'content' => 'Nous recherchons un webmaster capable de maintenir notre site internet. Blabla…',
-	        'date'    => new \Datetime()),
-	      array(
-	        'title'   => 'Offre de stage webdesigner',
-	        'id'      => 3,
-	        'author'  => 'Mathieu',
-	        'content' => 'Nous proposons un poste pour webdesigner. Blabla…',
-	        'date'    => new \Datetime())
-	    );
-		//Affichage du template
+		$listAdverts = $this
+			->getDoctrine()
+			->getManager()
+			->getRepository('OCPlatformBundle:Advert')
+			->getAdverts($page, $nbPerPage)
+		;
+
+		// On calcule le nombre total de pages grâce au count($listAdverts) qui retourne le nombre total d'annonces
+    	$nbPages = ceil(count($listAdverts)/$nbPerPage);
+
+    	if($page > $nbPages) {
+    		throw $this->createNotFoundException('La page "'.$page.'" n\'existe pas. ');
+    	}
+
+		//Affichage du template avec infos nécessaires à la vue
 		return $this->render('OCPlatformBundle:Advert:index.html.twig', array(
-		  'listAdverts' => $listAdverts
-		));	}
+			'listAdverts' => $listAdverts,
+			'nbPages'     => $nbPages,
+			'page'        => $page
+			)
+		);	
+	}
 
 	/**
 	 * affiche l'annonce correspondant à l'id $id
@@ -94,29 +94,20 @@ class AdvertController extends Controller{
 	      ->find($id)
 	    ;
 
-	    $repository = $this
-		    ->getDoctrine()
-		    ->getManager()
-		    ->getRepository('OCPlatformBundle:Advert')
-		  ;
-		
-		//soit $advert est null si $id n'est pas répertorié
-		if (null === $advert){
-			throw new NotFoundHttpException("L'annonce d'id ".$id." n'existe pas.");
-		}
+	    //Vérifier que l'annonce récupérée existe
+	    if( null === $advert ) {
+	    	throw $this->createNotFoundException("L'annonce d'id ".$id." n'existe pas.");
+	    }
+
+	    $listAdvertSkills = $em->getRepository('OCPlatformBundle:AdvertSkill')->findByAdvert($advert);
+
 
 		//on récupère la liste des candidatures pour cette annonce
 		$listApplications = $em
 			->getRepository('OCPlatformBundle:Application')
 			->findBy(array('advert' => $advert))
-		;
-
-		//on récupère la liste des AdvertSkill
-		$listAdvertSkills = $em
-			->getRepository('OCPlatformBundle:AdvertSkill')
-			->findBy(array('advert' => $advert))
-		;
-
+		
+;
 		return $this
 		->render(
 			'OCPlatformBundle:Advert:view.html.twig', 
@@ -137,108 +128,54 @@ class AdvertController extends Controller{
 
 		//Création de l'entité Advert
 		$advert = new Advert();
-		//Paramétrage de l'entité
-		$advert->setTitle('Recherche développeur web');
-		$advert->setAuthor('Alexandre');
-		$advert->setContent('Nous recherchons un développeur talentueux incessamment sous peu, c\'est urgent !');			
-		//la date et la publication ne sont pas définis ici mais dans le constructeur, automatiquement
 		
-		//Création de l'entité Image associée à l'Advert
-		$image = new Image();
-		$image->setUrl('http://laurentzandjon.files.wordpress.com/2014/05/etam-job-de-reve-etam-job-ete-testeuse-maillot.jpg');
-		$image->setAlt('Dream Job');
+		//on crée le formBuilder avec le service form factory de symfony2
+		$formBuilder = $this->get('form.factory')->createBuilder('form', $advert);
 
-		//Il faut lier l'image à l'annonce
-		$advert->setImage($image);
+		//on paramètre notre formulaire
+		$formBuilder
+			->add('date',      'date')
+			->add('title',     'text')
+			->add('content',   'textarea')
+			->add('author',    'text')
+			->add('published', 'checkbox', array('required' => false))
+			->add('save',      'submit')
+		;
 
-		//Création d"une première candidature
-		$application1 = new Application();
-		$application1->setAuthor('Laure');
-		$application1->setContent('J\'utilise Symfony2 depuis 3 ans.');
+		//on peut créer le formulaire
+		$form = $formBuilder->getForm();
 
-		//Création d"une deuxième candidature d'exemple
-		$application2 = new Application();
-		$application2->setAuthor('John');
-		$application2->setContent('Embauchez-moi, je suis très motivé.');
+		//On vérifie que la requete est de type POST
+		//On fait le lien requete <-> formulaire
+		$form->handleRequest($request);
 
-		//Il faut lier ces candidatures à l'annonce
-		$application1->setAdvert($advert);
-		$application2->setAdvert($advert);
+		//on check que les valeurs entrées dans le formulaire sont correctes
+		if ($form->isValid() ) {
+			$em = $this->getDoctrine()->getManager();
+			$em->persist($advert);
+			$em->flush();
+		
 
-		//Ensuite on récupère l'EntityManager
-		$doctrine = $this->getDoctrine();
-		$em = $doctrine->getManager();
+		$request
+			->getSession()
+			->getFlashBag()
+			->add('notice', 'Annonce bien enregistrée.');
 
-		//On récupère l'ensemble des compétences qui existent en base
-		$listSkills = $em->getRepository('OCPlatformBundle:Skill')->findAll();
+		return $this->redirect($this->generateUrl('oc_platform_view', array(
+			'id' => $advert->getId() 
+			)
+		));
 
-		foreach ($listSkills as $skill) {
-			
-			//On crée une nouvelle entité de type
-			//"relation entre 1 annonce et 1 compétence"
-			$advertSkill = new AdvertSkill();
-
-			//On lie cette entité à l'annonce
-			$advertSkill->setAdvert($advert);
-
-			//On la lie à la compétence courante dans cette boucle
-			$advertSkill->setSkill($skill);
-
-			//On pose un niveau requis
-			$advertSkill->setLevel('Chevalier Jedi du web au minimum');
-
-			//On n'oublie pas de persisté l'entité, 
-			//propriétaire dans ses 2 relations 1To1
-			$em->persist($advertSkill);
 		}
 
-		//Puis on persiste l'entité et on flush ce qui a été persisté avant
-		$em->persist($advert); //cette entité est maintenant gérée par Doctrine
+		//ici, le formulaire n'est pas valide
+		//soit parce que l'user s'est rendu ici à la main, en GET
+		//soit c'est du POST mais avec des données non validées
 
-		// si on n'avait pas défini le cascade={"persist"},
-	    // on devrait persister à la main l'entité $image
-	    // $em->persist($image);
-	    
-	    //pour cette relation avec les candidatures, 
-	    //pas de cascade lorsqu'on persiste Advert, car la relation est
-    	// définie dans l'entité Application et non Advert. 
-    	// On doit donc tout persister à la main ici.
-    	$em->persist($application1);
-    	$em->persist($application2);
-    
-		$em->flush(); //cet advert est enregistrée en base de donnée,
-					  // et Doctrine2 lui a attribué un id récupérable par getId()
-
-		if($request->isMethod('POST')){
-
-			// $antispam = $this->container->get('oc_platform.antispam'); //récupération du service antispam
-			// $text = '...';
-			// if($antispam->isSpam($text)){
-			// 	throw new \Exception('Votre message a été détecté comme spam !');
-			// }
-
-			$request->getSession()->getFlashBag()->add('notice', 'Annonce bien enregistrée.'); //message flash: tout est OK
-
-			//Redirection vers la page de visu de cette annonce
-			return $this->redirect(
-						$this->generateUrl('oc_platform_view', array('id' => $advert->getId())
-							)
-						);
-		}
-
-		//Test if spam fonctionnel
-		// $antispam = $this->container->get('oc_platform.antispam'); //récupération du service antispam
-		// $text = '...';
-		// if($antispam->isSpam($text)){
-		// 	throw new \Exception('Votre message a été détecté comme spam !');
-		// }
-		//si not POST, on affiche le formulaire
-		// return $this->render('OCPlatformBundle:Advert:add.html.twig');
-		//Redirection vers la page de visu de cette annonce
-		return $this->redirect(
-					$this->generateUrl('oc_platform_view', array('id' => $advert->getId())
-						)
-					);
+		return $this->render('OCPlatformBundle:Advert:add.html.twig', array(
+			'form' => $form->createView(),
+			)
+		);
 	}
 
 	/**
@@ -289,10 +226,10 @@ class AdvertController extends Controller{
 		
 		$em = $this->getDoctrine()->getManager();
 
-		$advert = $em->getRepository('OCPlatformBundle:Advert')->find('$id');
+		$advert = $em->getRepository('OCPlatformBundle:Advert')->find($id);
 
 		if (null === $advert) {
-			throw new NotFoundHttpException("L'annonce d'id ".$id." n'existe pas.");
+			throw $this->createNotFoundException("L'annonce d'id ".$id." n'existe pas.");
 		}
 
 		foreach ($listCategories as $category) {
@@ -311,11 +248,11 @@ class AdvertController extends Controller{
 	public function menuAction($limit){
 
 		//On créée une liste pour tester, mais à terme on passera par une BDD
-		$listAdverts = array(
-			array('id' => 2, 'title' => 'Recherche développeur Symfony2'),			
-			array('id' => 5, 'title' => 'Mission de webmaster'),
-			array('id' => 9, 'title' => 'Ofre de stage webdesigner')
-		);
+		$listAdverts = $this->getDoctrine()
+			->getManager()
+			->getRepository('OCPlatformBundle:Advert')
+			->getAdverts(1,3)
+		;
 
 		//le contrôleur passe les variables nécessaires au template
 		return $this->render(
