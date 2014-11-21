@@ -14,12 +14,14 @@
     {% for advert in listAdverts %}
       <li>
         <div>
-          <img src="{{ advert.image.url }}" alt="{{ advert.image.alt }}" width="290" height="100">
+          {% if advert.image is not null %}
+            <img src="{{ advert.image.url }}" alt="{{ advert.image.alt }}" width="290" height="100">
+          {% endif %}
         </div>
         <a href="{{ path('oc_platform_view', {'id': advert.id}) }}">
           {{ advert.title }}
         </a>
-        par {{ advert.author }},
+        par <em><u>{{ advert.author }}</u></em>,
         le {{ advert.date|date('d/m/Y') }}
         {% if not advert.categories.empty %}
         <p>Catégories associées : 

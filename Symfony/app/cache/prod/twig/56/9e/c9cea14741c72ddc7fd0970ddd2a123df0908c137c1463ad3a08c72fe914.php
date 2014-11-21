@@ -52,37 +52,43 @@ class __TwigTemplate_569ec9cea14741c72ddc7fd0970ddd2a123df0908c137c1463ad3a08c72
             // line 15
             echo "      <li>
         <div>
-          <img src=\"";
+          ";
             // line 17
-            echo twig_escape_filter($this->env, $this->getAttribute($this->getAttribute($context["advert"], "image", array()), "url", array()), "html", null, true);
-            echo "\" alt=\"";
-            echo twig_escape_filter($this->env, $this->getAttribute($this->getAttribute($context["advert"], "image", array()), "alt", array()), "html", null, true);
-            echo "\" width=\"290\" height=\"100\">
-        </div>
+            if ((!(null === $this->getAttribute($context["advert"], "image", array())))) {
+                // line 18
+                echo "            <img src=\"";
+                echo twig_escape_filter($this->env, $this->getAttribute($this->getAttribute($context["advert"], "image", array()), "url", array()), "html", null, true);
+                echo "\" alt=\"";
+                echo twig_escape_filter($this->env, $this->getAttribute($this->getAttribute($context["advert"], "image", array()), "alt", array()), "html", null, true);
+                echo "\" width=\"290\" height=\"100\">
+          ";
+            }
+            // line 20
+            echo "        </div>
         <a href=\"";
-            // line 19
+            // line 21
             echo twig_escape_filter($this->env, $this->env->getExtension('routing')->getPath("oc_platform_view", array("id" => $this->getAttribute($context["advert"], "id", array()))), "html", null, true);
             echo "\">
           ";
-            // line 20
+            // line 22
             echo twig_escape_filter($this->env, $this->getAttribute($context["advert"], "title", array()), "html", null, true);
             echo "
         </a>
-        par ";
-            // line 22
+        par <em><u>";
+            // line 24
             echo twig_escape_filter($this->env, $this->getAttribute($context["advert"], "author", array()), "html", null, true);
-            echo ",
+            echo "</u></em>,
         le ";
-            // line 23
+            // line 25
             echo twig_escape_filter($this->env, twig_date_format_filter($this->env, $this->getAttribute($context["advert"], "date", array()), "d/m/Y"), "html", null, true);
             echo "
         ";
-            // line 24
+            // line 26
             if ((!$this->getAttribute($this->getAttribute($context["advert"], "categories", array()), "empty", array()))) {
-                // line 25
+                // line 27
                 echo "        <p>Catégories associées : 
           ";
-                // line 26
+                // line 28
                 $context['_parent'] = (array) $context;
                 $context['_seq'] = twig_ensure_traversable($this->getAttribute($context["advert"], "categories", array()));
                 $context['loop'] = array(
@@ -99,14 +105,14 @@ class __TwigTemplate_569ec9cea14741c72ddc7fd0970ddd2a123df0908c137c1463ad3a08c72
                     $context['loop']['last'] = 1 === $length;
                 }
                 foreach ($context['_seq'] as $context["_key"] => $context["category"]) {
-                    // line 27
+                    // line 29
                     echo "              <button type=\"button\" class=\"btn btn-info\">";
                     echo twig_escape_filter($this->env, $this->getAttribute($context["category"], "name", array()), "html", null, true);
                     echo "</button>";
                     if ((!$this->getAttribute($context["loop"], "last", array()))) {
                         echo " ";
                     }
-                    // line 28
+                    // line 30
                     echo "          ";
                     ++$context['loop']['index0'];
                     ++$context['loop']['index'];
@@ -120,25 +126,53 @@ class __TwigTemplate_569ec9cea14741c72ddc7fd0970ddd2a123df0908c137c1463ad3a08c72
                 $_parent = $context['_parent'];
                 unset($context['_seq'], $context['_iterated'], $context['_key'], $context['category'], $context['_parent'], $context['loop']);
                 $context = array_intersect_key($context, $_parent) + $_parent;
-                // line 29
+                // line 31
                 echo "        </p>
     ";
             }
-            // line 31
+            // line 33
             echo "      </li>
     ";
             $context['_iterated'] = true;
         }
         if (!$context['_iterated']) {
-            // line 33
+            // line 35
             echo "      <li>Pas (encore !) d'annonces</li>
     ";
         }
         $_parent = $context['_parent'];
         unset($context['_seq'], $context['_iterated'], $context['_key'], $context['advert'], $context['_parent'], $context['loop']);
         $context = array_intersect_key($context, $_parent) + $_parent;
-        // line 35
+        // line 37
         echo "  </ul>
+
+    <ul class=\"pagination\">
+  ";
+        // line 41
+        echo "  ";
+        $context['_parent'] = (array) $context;
+        $context['_seq'] = twig_ensure_traversable(range(1, (isset($context["nbPages"]) ? $context["nbPages"] : null)));
+        foreach ($context['_seq'] as $context["_key"] => $context["p"]) {
+            // line 42
+            echo "    <li";
+            if (($context["p"] == (isset($context["page"]) ? $context["page"] : null))) {
+                echo " class=\"active\"";
+            }
+            echo ">
+      <a href=\"";
+            // line 43
+            echo twig_escape_filter($this->env, $this->env->getExtension('routing')->getPath("oc_platform_home", array("page" => $context["p"])), "html", null, true);
+            echo "\">";
+            echo twig_escape_filter($this->env, $context["p"], "html", null, true);
+            echo "</a>
+    </li>
+  ";
+        }
+        $_parent = $context['_parent'];
+        unset($context['_seq'], $context['_iterated'], $context['_key'], $context['p'], $context['_parent'], $context['loop']);
+        $context = array_intersect_key($context, $_parent) + $_parent;
+        // line 46
+        echo "</ul>
 
 ";
     }
@@ -155,6 +189,6 @@ class __TwigTemplate_569ec9cea14741c72ddc7fd0970ddd2a123df0908c137c1463ad3a08c72
 
     public function getDebugInfo()
     {
-        return array (  141 => 35,  134 => 33,  128 => 31,  124 => 29,  110 => 28,  103 => 27,  86 => 26,  83 => 25,  81 => 24,  77 => 23,  73 => 22,  68 => 20,  64 => 19,  57 => 17,  53 => 15,  48 => 14,  42 => 10,  39 => 9,  32 => 6,  29 => 5,);
+        return array (  175 => 46,  164 => 43,  157 => 42,  152 => 41,  147 => 37,  140 => 35,  134 => 33,  130 => 31,  116 => 30,  109 => 29,  92 => 28,  89 => 27,  87 => 26,  83 => 25,  79 => 24,  74 => 22,  70 => 21,  67 => 20,  59 => 18,  57 => 17,  53 => 15,  48 => 14,  42 => 10,  39 => 9,  32 => 6,  29 => 5,);
     }
 }

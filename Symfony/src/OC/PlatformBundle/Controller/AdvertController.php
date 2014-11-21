@@ -3,7 +3,7 @@
  * @Author: Mehdi
  * @Date:   2014-11-15 16:33:06
  * @Last Modified by:   Mehdi
- * @Last Modified time: 2014-11-20 22:36:00
+ * @Last Modified time: 2014-11-21 22:30:28
  */
 
 //src/OC/PlatformBundle/Controller/AdvertController.php
@@ -21,6 +21,7 @@ use OC\PlatformBundle\Entity\Advert;
 use OC\PlatformBundle\Entity\Image;
 use OC\PlatformBundle\Entity\Application;
 use OC\PlatformBundle\Entity\AdvertSkill;
+use OC\PlatformBundle\Form\AdvertType;
 
 //=====CLASSE=====
 class AdvertController extends Controller{ 
@@ -129,21 +130,24 @@ class AdvertController extends Controller{
 		//Création de l'entité Advert
 		$advert = new Advert();
 		
-		//on crée le formBuilder avec le service form factory de symfony2
-		$formBuilder = $this->get('form.factory')->createBuilder('form', $advert);
+		// //on crée le formBuilder avec le service form factory de symfony2
+		// $formBuilder = $this->get('form.factory')->createBuilder('form', $advert);
 
-		//on paramètre notre formulaire
-		$formBuilder
-			->add('date',      'date')
-			->add('title',     'text')
-			->add('content',   'textarea')
-			->add('author',    'text')
-			->add('published', 'checkbox', array('required' => false))
-			->add('save',      'submit')
-		;
+		// //on paramètre notre formulaire
+		// $formBuilder
+		// 	->add('date',      'date')
+		// 	->add('title',     'text')
+		// 	->add('content',   'textarea')
+		// 	->add('author',    'text')
+		// 	->add('published', 'checkbox', array('required' => false))
+		// 	->add('save',      'submit')
+		// ;
 
-		//on peut créer le formulaire
-		$form = $formBuilder->getForm();
+		// //on peut créer le formulaire
+		// $form = $formBuilder->getForm();
+		
+		// On peut créer directement notre formulaire réutilisable depuis le dossier Form
+		$form = $this->get('form.factory')->create(new AdvertType, $advert);
 
 		//On vérifie que la requete est de type POST
 		//On fait le lien requete <-> formulaire
@@ -159,7 +163,7 @@ class AdvertController extends Controller{
 		$request
 			->getSession()
 			->getFlashBag()
-			->add('notice', 'Annonce bien enregistrée.');
+			->add('notice', 'L\'annonce a bien bien enregistrée.');
 
 		return $this->redirect($this->generateUrl('oc_platform_view', array(
 			'id' => $advert->getId() 
