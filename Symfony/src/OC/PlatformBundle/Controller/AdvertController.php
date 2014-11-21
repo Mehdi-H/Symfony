@@ -3,7 +3,7 @@
  * @Author: Mehdi
  * @Date:   2014-11-15 16:33:06
  * @Last Modified by:   Mehdi
- * @Last Modified time: 2014-11-21 22:30:28
+ * @Last Modified time: 2014-11-21 23:39:17
  */
 
 //src/OC/PlatformBundle/Controller/AdvertController.php
@@ -22,6 +22,7 @@ use OC\PlatformBundle\Entity\Image;
 use OC\PlatformBundle\Entity\Application;
 use OC\PlatformBundle\Entity\AdvertSkill;
 use OC\PlatformBundle\Form\AdvertType;
+use OC\PlatformBundle\Form\AdvertEditType;
 
 //=====CLASSE=====
 class AdvertController extends Controller{ 
@@ -199,30 +200,54 @@ class AdvertController extends Controller{
 			throw new NotFoundHttpException("L'annonce d'id ".$id." n'existe pas.");
 		}
 
-		//on récupère toutes les catégories avec findAll
-		$listCategories = $em->getRepository('OCPlatformBundle:Category')->findAll();
+		// //on récupère toutes les catégories avec findAll
+		// $listCategories = $em->getRepository('OCPlatformBundle:Category')->findAll();
 
-		//on boucle sur les catégories pour les lier à cette annonce
-		foreach ($listCategories as $category) {
-			$advert->addCategory($category);
-		}
+		// //on boucle sur les catégories pour les lier à cette annonce
+		// foreach ($listCategories as $category) {
+		// 	$advert->addCategory($category);
+		// }
 
-		//Persistance:
-		// Pour persister le changement dans la relation, 
-		// il faut persister l'entité propriétaire
-   		// Ici, Advert est le propriétaire, donc 
-   		// inutile de la persister car on l'a récupérée depuis Doctrine
-   		// 
+		// //Persistance:
+		// // Pour persister le changement dans la relation, 
+		// // il faut persister l'entité propriétaire
+  //  		// Ici, Advert est le propriétaire, donc 
+  //  		// inutile de la persister car on l'a récupérée depuis Doctrine
+  //  		// 
    		$listAdvertSkills = $em
 			->getRepository('OCPlatformBundle:AdvertSkill')
 			->findBy(array('advert' => $advert))
 		;
    		
-   		$em->flush(); //enregistrement
+  //  		$em->flush(); //enregistrement
+   		
+   		$form = $this->get('form.factory')->create(new AdvertEditType, $advert);
 
-		return $this->render('OCPlatformBundle:Advert:view.html.twig', array(
+   		$form->handleRequest($request);
+
+		//on check que les valeurs entrées dans le formulaire sont correctes
+		if ($form->isValid() ) {
+			$em = $this->getDoctrine()->getManager();
+			$em->persist($advert);
+			$em->flush();
+		
+
+		$request
+			->getSession()
+			->getFlashBag()
+			->add('notice', 'L\'annonce a bien bien enregistrée.');
+
+		return $this->redirect($this->generateUrl('oc_platform_view', array(
+			'id' => $advert->getId() 
+			)
+		));
+
+		}
+
+		return $this->render('OCPlatformBundle:Advert:edit.html.twig', array(
 			'advert'           => $advert,
-			'listAdvertSkills' => $listAdvertSkills
+			'listAdvertSkills' => $listAdvertSkills,
+			'form' => $form->createView()
 		));
 	}
 
